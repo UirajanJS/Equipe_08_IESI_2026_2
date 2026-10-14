@@ -1,13 +1,13 @@
 # Documento de Visão
 
-1. Problema e Oportunidade
+1. **Problema e Oportunidade**
 O Problema: Alta carga operacional na bancada devido à redundância de processos (dupla assinatura no sistema e em livro físico), erros/inconsistências de dados cadastrais de amostras vindos da integração com o AGHU e fragmentação do controle de amostras em planilhas paralelas vulneráveis a falhas de preenchimento.
 
 Impacto: Atraso no Turnaround Time (TAT) de biópsias e laudos histopatológicos, retrabalho frequente das equipes de recepção e bancada, risco de perda de rastreabilidade de amostras corporais e dificuldade da gestão em acompanhar gargalos de produção em tempo real por falta de indicadores unificados.
 
 Solução Proposta: Implantação do Livro de Protocolo Eletrônico e Painel de Gestão do SAP, centralizando a rastreabilidade legal com assinatura eletrônica institucional, aplicando regras rígidas de validação na recepção e fornecendo visibilidade de SLA em tempo real por fase operacional.
-
-2. Partes Interessadas (Stakeholders)
+---
+2. **Partes Interessadas (Stakeholders)**
 Usuários Finais: Médicos Patologistas, Residentes, Técnicos de Histologia/Anatomia Patológica, Recepcionistas do SAP.
 
 Patrocinadores: Diretoria Médica/Hospitalar, Chefia do SAP, Gestão de TI / Sistemas de Informação.
@@ -27,7 +27,8 @@ Beneficiários Finais (Externos):
 Pacientes: Diagnósticos mais rápidos (menor tempo de espera por laudos de biópsias), redução do risco de trocas de amostras e garantia de maior segurança no cuidado prestado.
 
 Diretoria Hospitalar e Patrocinadores: Redução de custos operacionais com retrabalho, mitigações de riscos jurídicos/sanitários e aumento da capacidade produtiva e reputação da instituição.
-3. Escopo do Produto
+---
+3. **Escopo do Produto**
 O que ESTÁ no Escopo (Dentro do Projeto):
 Módulo de Protocolo Eletrônico: Livro digital com validade jurídica, rastreabilidade completa de entradas/saídas e rito de retificação/auditoria (versionamento com justificativa obrigatória e log).
 
@@ -43,8 +44,8 @@ Alterações no código-fonte interno do AGHU (o projeto apenas consome e valida
 Aquisição ou manutenção de hardware de bancada (impressoras térmicas, microtótomos, leitores de código de barras).
 
 Módulo de faturamento hospitalar/tabelas SUS (gerenciado exclusivamente pelos módulos nativos do AGHU).
-
-4. Metas e Objetivos de Negócio
+---
+4. **Metas e Objetivos de Negócio**
 Redução do Turnaround Time (TAT): Reduzir em 25% o tempo médio total entre a recepção da amostra e a liberação do laudo final em até 90 dias após o go-live.
 
 Eliminação do Erro na Origem: Reduzir a zero o ingresso de amostras com dados cadastrais incorruptos ou incompletos na bancada através da trava na recepção.
