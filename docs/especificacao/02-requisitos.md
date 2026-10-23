@@ -11,7 +11,7 @@ Sistema de acompanhamento de exames da Anatomia Patológica do HC-UFPE. Ele lê 
 | RF003 | Recebimento de amostra | Ao bipar ou digitar o código da etiqueta, mostrar numa só tela o paciente e cada amostra com sua descrição, permitindo receber só os itens das 5 bancadas (HP, CO, IHQ, CG, CCV). | Essencial |
 | RF004 | Conferência da amostra | Checklist obrigatório por amostra: sigla × conteúdo do frasco, descrição × frasco e nº de recipientes. | Essencial |
 | RF005 | Não conformidade e devolução | Registrar a não conformidade com motivo padronizado e a devolução ao setor de origem. | Essencial |
-| RF006 | Número interno | Gerar o nº interno sequencial por tipo (HP, CG, CCV, CO, IH), reiniciando a cada ano. | Essencial |
+| RF006 | Número interno | Gerar o nº interno no formato sigla do tipo (HP, CG, CCV, CO, IH) + sequencial curto, reiniciado a cada ano, para ser escrito no cassete e usado na ordem do arquivo. | Essencial |
 | RF007 | Dados complementares | Registrar urgência, clínica responsável, classificação de faturamento (geral, mama, colo) e nº de peças. | Essencial |
 | RF008 | Etiquetas internas | Imprimir na etiquetadora etiquetas com nº interno, paciente e código de barras para frascos e lâminas. | Importante |
 | RF009 | Ficha de trabalho | Imprimir a ficha de trabalho com nº interno e descrição de cada amostra quando o material chegar sem ficha. | Importante |
@@ -33,6 +33,7 @@ Sistema de acompanhamento de exames da Anatomia Patológica do HC-UFPE. Ele lê 
 | RF025 | Painel de urgências | Lista das urgências ainda não liberadas, visível para todos os setores. | Importante |
 | RF026 | Localização do material | Registrar onde estão lâminas, blocos, fichas e sobras (arquivo de aço, pastas, armário). | Importante |
 | RF027 | Indicadores e prazos | Tempo por etapa, laudos no prazo e alertas para exames perto dos limites (20 dias internos, 60 dias do Ministério da Saúde). | Desejável |
+| RF028 | Responsável e edição concorrente | Ao abrir um exame para registrar uma etapa, o profissional passa a ser o responsável por ela. Quem abrir o mesmo exame vê o aviso "em edição por [nome] desde [hora]" e fica só com leitura até a edição ser concluída, cancelada ou transferida. | Importante |
 
 ### 📌 Legenda de Níveis de Prioridade:
 - **Essencial (Alta):** Funcionalidade indispensável para o funcionamento básico da aplicação. Sem ela, o sistema não pode ir para produção (ex: autenticação, cadastros base).
@@ -43,12 +44,19 @@ Sistema de acompanhamento de exames da Anatomia Patológica do HC-UFPE. Ele lê 
 
 | ID | Categoria | Descrição |
 | :--- | :--- | :--- |
-| RNF001 | Integração AGHU | Somente leitura, sem escrita no AGHU. A integração fica numa camada própria, que começa pelo CSV exportado do AGHU e depois passa para a conexão direta. |
-| RNF002 | Rastreabilidade | Toda passagem de etapa é registrada com usuário, data e hora, e não pode ser apagada. |
-| RNF003 | Integridade da numeração | O nº interno é único mesmo com várias pessoas recebendo ao mesmo tempo, sem repetições nem saltos. |
-| RNF004 | Periféricos | Leitor de código de barras usado como teclado (sem instalação); etiquetas com layout configurável para a etiquetadora do setor. |
-| RNF005 | Usabilidade na recepção | Recebimento sem troca de telas, operável só com leitor e teclado, com os dados na tela em até 2 s após a leitura. |
-| RNF006 | Retenção | Dados dos exames e da localização do material guardados por no mínimo 10 anos. |
+| RNF001 | Restrição de ambiente | O sistema funciona sem nenhuma alteração no AGHU, pois mudanças nele só podem ser solicitadas à sede da EBSERH em Brasília [56:49]. |
+| RNF002 | Interoperabilidade | Reconhece o código da etiqueta AGHU no formato atual, incluindo o sufixo de cada amostra (001, 002, 003) [69:04, 72:31]. |
+| RNF003 | Interoperabilidade | Usa os mesmos nomes de status do AGHU (ex.: "liberado", "a coletar"), sem criar uma nomenclatura paralela [66:54]. |
+| RNF004 | Implantação | Roda na infraestrutura do próprio HC, como o sistema de leitos de UTI hoje em uso oficial [59:32]. |
+| RNF005 | Segurança | Dados de pacientes acessíveis apenas a usuários do hospital com perfil autorizado, por se tratar de dados de saúde. |
+| RNF006 | Rastreabilidade física | O mesmo identificador legível aparece em todos os materiais do exame: frasco, cassete, bloco, lâmina e ficha [34:48]. |
+| RNF007 | Responsabilização | Toda etapa registrada exibe o nome de quem a executou, para saber a quem procurar em caso de problema [21:08]. |
+| RNF008 | Usabilidade | A interface usa as siglas e os termos do setor (HP, CG, CCV, CO, IH, bancada, macro) [22:16]. |
+| RNF009 | Usabilidade | Telas simples para usuários com pouca afinidade com sistemas, com campos obrigatórios em vez de opcionais [89:55]. |
+| RNF010 | Usabilidade | Exames urgentes têm destaque visual em todas as telas em que aparecem [47:26]. |
+| RNF011 | Coexistência | O sistema funciona em conjunto com a ficha física, que continua acompanhando o material [55:13]. |
+| RNF012 | Extensibilidade | Novos anticorpos, colorações e tipos de material podem ser incluídos sem alterar o código (hoje são cerca de 100 anticorpos) [111:22]. |
+| RNF013 | Confiabilidade | Nenhum registro é perdido ou fica incompleto se a conexão cair no meio de uma operação. |
 
 ## 3. Detalhamento SDD (CARE)
 Para cada requisito, a implementação deve seguir o padrão:
@@ -66,7 +74,7 @@ Para cada requisito, a implementação deve seguir o padrão:
 * **Evaluation (Avaliação)**: Cada perfil acessa as rotas permitidas e é barrado nas demais.
 
 ### [CARE-RF003] Recebimento de amostra
-* **Context (Contexto)**: Dados da solicitação disponíveis pela integração com o AGHU (RNF001).
+* **Context (Contexto)**: Dados da solicitação disponíveis pela leitura do AGHU (RNF001).
 * **Action (Ação)**: Criar a tela de recebimento com a lista de amostras e suas descrições.
 * **Result (Resultado)**: Exame criado com as amostras recebidas, data, hora e usuário.
 * **Evaluation (Avaliação)**: Uma solicitação com itens HP e sorologia mostra só os HP; recebendo 2 de 3 amostras, o exame fica com 2.
@@ -215,8 +223,13 @@ Para cada requisito, a implementação deve seguir o padrão:
 * **Result (Resultado)**: Relatório por período e destaque nas filas.
 * **Evaluation (Avaliação)**: Indicadores conferidos contra dados de teste calculados à mão.
 
+### [CARE-RF028] Responsável e edição concorrente
+* **Context (Contexto)**: Usuários autenticados (RF001) e exames com etapas registráveis.
+* **Action (Ação)**: Ao iniciar uma edição, reservar a etapa para o usuário; mostrar aos demais quem está editando e desde quando; liberar a reserva ao salvar, cancelar, expirar o tempo configurado ou transferir a responsabilidade.
+* **Result (Resultado)**: Só uma pessoa edita a etapa por vez; os demais veem o responsável e acessam em modo leitura.
+* **Evaluation (Avaliação)**: Com dois usuários abrindo o mesmo exame, o segundo vê o aviso com o nome do primeiro e não consegue salvar; após o primeiro salvar, o segundo consegue editar.
+
 ## 4. Pendências a validar com a equipe
 - Quem abre a solicitação do externo no AGHU: a Regulação ou a Anatomia Patológica? (RF010)
 - Há leitor de código de barras fora da recepção? (RF013)
 - O pré-laudo do residente fica no sistema ou continua no AGHU? (RF020)
-- O HP vindo da congelação ganha nº interno novo ou herda o da CO? (RF006, RF015)
