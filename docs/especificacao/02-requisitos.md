@@ -1,4 +1,3 @@
-# Especificação de Requisitos
 
 Sistema de acompanhamento de exames da Anatomia Patológica do HC-UFPE. Ele lê dados do AGHU mas não grava nele, e substitui a planilha do Teams, o livro de protocolo e as pranchetas. Usa a etiquetadora e o leitor de código de barras do setor.
 
